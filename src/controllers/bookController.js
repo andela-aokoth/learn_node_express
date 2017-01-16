@@ -11,20 +11,19 @@ var bookController = function(bookService, nav) {
     var getIndex = function(req, res) {
         var url = 'mongodb://localhost:27017/libraryApp';
         mongodb.connect(url, function(url, db) {
-          var collection = db.collection('books');
-          collection.find({}).toArray(function(err, results) {
-              if (err) {
-                  console.log(err.message);
-              } else {
-                  res.render('bookListView', {
-                      title: 'Hello From Render!',
-                      nav: nav,
-                      books: results
-                  });
-              }
-          });
+            var collection = db.collection('books');
+            collection.find({}).toArray(function(err, results) {
+                if (err) {
+                    console.log(err.message);
+                } else {
+                    res.render('bookListView', {
+                        title: 'Hello From Render!',
+                        nav: nav,
+                        books: results
+                    });
+                }
+            });
         });
-
     };
 
     var getById = function(req, res) {
@@ -32,15 +31,24 @@ var bookController = function(bookService, nav) {
         var url = 'mongodb://localhost:27017/libraryApp';
         mongodb.connect(url, function(url, db) {
             var collection = db.collection('books');
-            collection.findOne({_id: id}, function(err, results) {
+            collection.findOne({
+                _id: id
+            }, function(err, results) {
                 if (err) {
                     console.log(err.message);
                 } else {
-                    res.render('bookView', {
-                        title: 'Hello From Render!',
-                        nav: nav,
-                        books: results
+                    bookService.getBookById(results.bookId, function(err, book) {
+                        if (err) {
+                            console.log(err.message);
+                        }
+                        results.book = book;
+                        res.render('bookView', {
+                            title: 'Hello From Render!',
+                            nav: nav,
+                            books: results
+                        });
                     });
+
                 }
             });
         });
